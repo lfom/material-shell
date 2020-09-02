@@ -106,6 +106,7 @@ var MsWorkspace = class MsWorkspace {
     }
 
     close() {
+        log('***** msWorkspace close');
         Promise.all(
             this.msWindowList.map((msWindow) => {
                 return msWindow.kill();
@@ -116,6 +117,7 @@ var MsWorkspace = class MsWorkspace {
     }
 
     async addMsWindow(msWindow, focus = false) {
+        log('***** addMsWindow focus: ' + focus);
         if (
             !msWindow ||
             (msWindow.msWorkspace && msWindow.msWorkspace === this)
@@ -138,15 +140,21 @@ var MsWorkspace = class MsWorkspace {
         // or if there's no focused window
         if (window.grabbed || !this.windowFocused) {
         } */
+        log('***** addMsWindow end');
     }
 
     async removeMsWindow(msWindow) {
+        log('***** removeMsWindow msWindow: ' + msWindow);
         if (this.msWindowList.indexOf(msWindow) === -1) return;
         const tileableIsFocused = msWindow === this.tileableFocused;
+        log('***** removeMsWindow isFocused: ' + tileableIsFocused
+            + ' | tileableList.length: ' + this.tileableList.length);
         const tileableIndex = this.tileableList.indexOf(msWindow);
         const oldTileableList = [...this.tileableList];
         oldTileableList.splice(tileableIndex, 1, [null]);
         this.tileableList.splice(tileableIndex, 1);
+        log('***** removeMsWindow tilableIndex: ' + tileableIndex
+            + ' | focusedIndex: ' + this.focusedIndex);
         if (this.focusedIndex > tileableIndex) {
             this.focusedIndex--;
         } else if (
@@ -159,10 +167,13 @@ var MsWorkspace = class MsWorkspace {
         // If there's no more focused msWindow on this workspace focus the last one
 
         if (tileableIsFocused) {
+            log('***** removeMsWindow focusTileable: ' + this.focusedIndex);
             this.focusTileable(this.tileableList[this.focusedIndex], true);
+            
         }
         this.msWorkspaceActor.updateUI();
         this.refreshFocus();
+        log('***** removeMsWindow end');
     }
 
     async emitTileableListChangedOnce(oldTileableList) {
@@ -244,7 +255,9 @@ var MsWorkspace = class MsWorkspace {
     }
 
     focusTileable(tileable, forced) {
-        if (tileable === this.tileableFocused && !forced) {
+        log('***** focusTileable forced: ' + forced + ' | tileable = ' + tileable);
+        log('***** focusTileable this.tileableFocused = ' + this.tileableFocused);
+        if (!tileable || (tileable === this.tileableFocused && !forced)) {
             return;
         }
         const oldTileableFocused = this.tileableFocused;
@@ -257,12 +270,14 @@ var MsWorkspace = class MsWorkspace {
             }
         }
         this.emit('tileable-focus-changed', tileable, oldTileableFocused);
+        log('***** focusTileable end - ' + this.tileableFocused);
     }
 
     refreshFocus() {
         if (this.msWorkspaceManager.getActiveMsWorkspace() !== this) {
             return;
         }
+        log('***** refreshFocus tileableFocused: ' + this.tileableFocused);
         if (this.tileableFocused instanceof MsWindow) {
             this.tileableFocused.takeFocus();
         } else {
@@ -376,6 +391,12 @@ var MsWorkspace = class MsWorkspace {
         if (this.monitorIsExternal) {
             return;
         }
+        if (!this.workspace) {
+            log('***** workspace.active null');
+            this.msWorkspaceActor.updateUI();
+            this.refreshFocus();
+            return;
+        }
         if (
             this.tileableFocused instanceof MsWindow &&
             this.tileableFocused.metaWindow &&
@@ -462,6 +483,7 @@ var MsWorkspaceActor = GObject.registerClass(
         }
 
         updateUI() {
+            log('***** updateUI msWorkspace: ' + this.msWorkspace.tileableList);
             const monitorInFullScreen = global.display.get_monitor_in_fullscreen(
                 this.msWorkspace.monitor.index
             );

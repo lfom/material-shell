@@ -99,7 +99,20 @@ var MsWindowManager = class MsWindowManager extends MsManager {
     }
 
     onMetaWindowUnManaged(metaWindow) {
+        log('***** onMetaWindowUnManaged metaWindow: ' + metaWindow);
         if (Me.disableInProgress || Me.closing) return;
+        if (
+            this.metaWindowWaitingForAssignationList
+                .map((o) => o.metaWindow)
+                .includes(metaWindow)
+        ) {
+            this.metaWindowWaitingForAssignationList.splice(
+                this.metaWindowWaitingForAssignationList
+                    .map((o) => o.metaWindow)
+                    .indexOf(metaWindow),
+                1
+            );
+        }
         if (
             metaWindow.msWindow &&
             metaWindow.msWindow.metaWindow === metaWindow
@@ -291,11 +304,15 @@ var MsWindowManager = class MsWindowManager extends MsManager {
 
         // Remove MsWindow waiting for too much time. We probably missed the window awaited.
         this.msWindowWaitingForMetaWindowList.forEach((waitingMsWindow) => {
+            log('***** waitingMsWindow: ' + waitingMsWindow.msWindow);
+            log('***** waitingMsWindow checked: ' + waitingMsWindow.checked +
+                ' | time: ' + (timestamp - waitingMsWindow.timestamp));
             if (
                 (waitingMsWindow.checked &&
-                    timestamp - waitingMsWindow.timestamp > 2000) ||
+                    timestamp - waitingMsWindow.timestamp > 3000) ||
                 timestamp - waitingMsWindow.timestamp > 5000
             ) {
+                log('***** waitingMsWindow kill: ' + waitingMsWindow.msWindow);
                 waitingMsWindow.msWindow.kill();
                 this.msWindowWaitingForMetaWindowList.splice(
                     this.msWindowWaitingForMetaWindowList.indexOf(

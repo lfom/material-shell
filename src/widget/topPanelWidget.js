@@ -1,5 +1,6 @@
 /** Gnome libs imports */
-const { GObject, St, Clutter } = imports.gi;
+const { GObject, St, Clutter, Gio } = imports.gi;
+const Main = imports.ui.main;
 
 /** Extension imports */
 const Me = imports.misc.extensionUtils.getCurrentExtension();
@@ -20,6 +21,27 @@ var TopPanel = GObject.registerClass(
             this.msWorkspace = msWorkspace;
 
             this.taskBar = new TaskBar(msWorkspace);
+
+            // this.searchIcon = new St.Icon({
+            //     gicon: Gio.icon_new_for_string(
+            //         `${Me.path}/assets/icons/magnify-symbolic.svg`
+            //     ),
+            //     style_class: 'mat-panel-button-icon',
+            //     icon_size: Me.msThemeManager.getPanelSizeNotScaled() / 2,
+            // });
+
+            // this.searchButton = new MatPanelButton({
+            //     child: this.searchIcon,
+            //     primary: true,
+            //     can_focus: true,
+            //     track_hover: true,
+            // });
+
+            // this.searchButton.connect('clicked', () => {
+            //     (Main.overview._shown) ? Main.overview.hide() : Main.overview.show();
+            // });
+
+            // this.add_child(this.searchButton);
 
             this.tilingIcon = new St.Icon({
                 style_class: 'mat-panel-button-icon',
@@ -45,6 +67,9 @@ var TopPanel = GObject.registerClass(
                 this.tilingIcon.set_icon_size(
                     Me.msThemeManager.getPanelSizeNotScaled() / 2
                 );
+                // this.searchIcon.set_icon_size(
+                //     Me.msThemeManager.getPanelSizeNotScaled() / 2
+                // );
                 this.queue_relayout();
             });
         }
@@ -75,6 +100,17 @@ var TopPanel = GObject.registerClass(
             this.set_allocation(box, flags);
             let themeNode = this.get_theme_node();
             const contentBox = themeNode.get_content_box(box);
+
+            // let searchButtonBox = new Clutter.ActorBox();
+            // searchButtonBox.x1 = contentBox.x1;
+            // searchButtonBox.x2 = Math.max(
+            //     this.searchButton.width,
+            //     0
+            // );
+            // searchButtonBox.y1 = contentBox.y1;
+            // searchButtonBox.y2 = contentBox.y2;
+            // this.searchButton.allocate(searchButtonBox, flags);
+
             let taskBarBox = new Clutter.ActorBox();
             taskBarBox.x1 = contentBox.x1;
             taskBarBox.x2 = Math.max(

@@ -30,7 +30,7 @@ var MsPanel = GObject.registerClass(
             });
             this.add_child(this.topBox);
 
-            let icon = new St.Icon({
+            this.searchIcon = new St.Icon({
                 gicon: Gio.icon_new_for_string(
                     `${Me.path}/assets/icons/magnify-symbolic.svg`
                 ),
@@ -39,7 +39,7 @@ var MsPanel = GObject.registerClass(
             });
 
             this.searchButton = new MatPanelButton({
-                child: icon,
+                child: this.searchIcon,
                 primary: true,
             });
 
@@ -65,7 +65,7 @@ var MsPanel = GObject.registerClass(
             });
 
             Me.msThemeManager.connect('panel-size-changed', () => {
-                icon.set_icon_size(
+                this.searchIcon.set_icon_size(
                     Me.msThemeManager.getPanelSizeNotScaled() / 2
                 );
                 this.queue_relayout();

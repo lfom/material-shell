@@ -9,8 +9,7 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const { MatButton } = Me.imports.src.widget.material.button;
 const { 
     DropPlaceholder,
-    TaskBarItem,
-    dragData
+    TaskBarItem
 } = Me.imports.src.widget.taskBar;
 const { MsWindow } = Me.imports.src.layout.msWorkspace.msWindow;
 const {
@@ -184,16 +183,18 @@ var WorkspaceList = GObject.registerClass(
             });
         }
 
-        handleDragOver() {
-            if (!this.tempDragData.draggedOverByChild) {
-                let workspaceButton =
+        handleDragOver(source, actor, x, y) {
+            if (source instanceof WorkspaceButton) { // Needed for dragging over tasks
+                if (!this.tempDragData.draggedOverByChild) {
+                    let workspaceButton =
                     this.items[this.items.length - 1] ===
                     this.tempDragData.workspaceButton
-                        ? this.items[this.items.length - 2]
-                        : this.items[this.items.length - 1];
-                this._onDragOver(workspaceButton, false);
-            } else {
-                this.tempDragData.draggedOverByChild = false;
+                    ? this.items[this.items.length - 2]
+                    : this.items[this.items.length - 1];
+                    this._onDragOver(workspaceButton, false);
+                } else {
+                    this.tempDragData.draggedOverByChild = false;
+                }
             }
 
             return DND.DragMotionResult.MOVE_DROP;
@@ -246,7 +247,7 @@ var WorkspaceList = GObject.registerClass(
             this.tempDragData.draggedOver = workspaceButton;
             this.tempDragData.draggedBefore = before;
             const [buttonWidth, buttonHeight] = this.tempDragData.workspaceButton.get_preferred_width(-1);
--           this.dropPlaceholder.resize(buttonWidth, buttonHeight);
+            this.dropPlaceholder.resize(buttonWidth, buttonHeight);
             let dropPlaceholderIndex = this.buttonList
                 .get_children()
                 .indexOf(this.dropPlaceholder);
@@ -575,32 +576,25 @@ var WorkspaceButton = GObject.registerClass(
                 return true;
             }
             else if (source instanceof TaskBarItem) {
-                const dragItem = dragData.current.item;
-                const tileableIndex = this.msWorkspace.tileableList.indexOf(dragItem.tileable);
-                const activeMsWorkspace = Me.msWorkspaceManager.getActiveMsWorkspace();
-                const isOnlyTileable = (activeMsWorkspace.tileableList.length == 2);
-                const isDraggable = this.draggable;
+                const tileableIndex = this.msWorkspace.tileableList.indexOf(
+                    source.tileable
+                );
+                const tileable = source.tileable;
                 if (
-                    tileableIndex < 0 && 
-                    !(!isDraggable && isOnlyTileable)
+                    (tileableIndex < 0) &&
+                    (tileable instanceof MsWindow)
                 ) {
-                    this.msWorkspace.activate();
-                    this.msWorkspaceManager.setWindowToMsWorkspace(
-                        dragItem.tileable,
-                        this.msWorkspace
-                        );
-                    activeMsWorkspace.refreshFocus();
-                    if (isDraggable) {
-                        this.msWorkspace.focusLastTileable();
-                    } else {
-                        this.msWorkspace.focusTileable(
-                            this.msWorkspace.tileableList[0], 
-                            true
-                        );
-                    }
+                    (async () => {
+                        await source.emit('drag-dropped');
+                        await tileable.msWorkspace.removeMsWindow(tileable);
+                        await this.msWorkspace.addMsWindow(tileable, true);
+                        this.msWorkspaceManager.stateChanged();
+                        this.msWorkspace.activate();
+                      })();
+
+                } else {
+                    source.emit('drag-dropped');
                 }
-                this.msWorkspace.refreshFocus();
-                dragItem.emit('drag-dropped');
                 return true;
             }
             return false;

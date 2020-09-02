@@ -614,6 +614,7 @@ var MsWindow = GObject.registerClass(
                 }
             });
             Promise.all([...dialogPromises, promise]).then(() => {
+                log('***** msWindow kill: ' + this);
                 if (this._persistent) {
                     this.unsetWindow();
                 } else {
@@ -670,11 +671,16 @@ var MsWindow = GObject.registerClass(
         }
 
         toString() {
-            let string = super.toString();
-            return `${string.slice(
-                0,
-                string.length - 1
-            )} ${this.app.get_name()}]`;
+            try {
+                let string = super.toString();
+                return `${string.slice(
+                    0,
+                    string.length - 1
+                    )} ${this.app.get_name()}]`;
+                } catch (error) {
+                    logError(error, '<MsWindow.toString>');
+                    return 'null';
+                }
         }
 
         _onDestroy() {
