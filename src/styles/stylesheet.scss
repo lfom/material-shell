@@ -342,6 +342,10 @@ $panel-opacity: 0.876; // Don't change this value since it's dynamically changed
             &:hover {
                 color: rgba(255, 0, 0, 0.4);
             }
+            
+            &:hover:active {
+                background: rgba(255, 255, 255, 0.12);
+            }
         }
         .task-small-icon {
             icon-size: 18px;

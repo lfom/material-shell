@@ -225,6 +225,8 @@ subtitle-1 {
         color: rgba(255, 255, 255, 0.6); }
       .task-bar-item .task-bar-item-content .task-close-button:hover {
         color: rgba(255, 0, 0, 0.4); }
+      .task-bar-item .task-bar-item-content .task-close-button:hover:active {
+        background: rgba(255, 255, 255, 0.12); }
     .task-bar-item .task-bar-item-content .task-small-icon {
       icon-size: 18px; }
 

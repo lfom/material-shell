@@ -53,11 +53,13 @@ var TaskBar = GObject.registerClass(
         }
 
         onTileableListChange() {
+            log('***** taskBar.onTileableListChange');
             this.updateItems();
             this._animateActiveIndicator();
         }
 
         onFocusChanged(tileableFocused, oldTileableFocused) {
+            log('***** taskBar.onFocusChanged');
             if (tileableFocused === oldTileableFocused) {
                 return;
             }
@@ -82,6 +84,7 @@ var TaskBar = GObject.registerClass(
         }
 
         updateItems() {
+            log('***** taskBar.updateItems');
             this.items.forEach((item) => item.destroy());
             this.items = this.msWorkspace.tileableList.map(
                 (tileable, index) => {
@@ -89,7 +92,10 @@ var TaskBar = GObject.registerClass(
                         const item = new TileableItem(tileable);
                         this.menuManager.addMenu(item.menu);
                         item.connect('left-clicked', (_) => {
+                            this.taskActiveIndicator.hide();
                             this.msWorkspace.focusTileable(tileable, true);
+                            this.taskActiveIndicator.show();
+                            this.resetActiveIndicator(tileable);
                         });
                         item.connect('middle-clicked', (_) => {
                             tileable.kill();
@@ -163,6 +169,7 @@ var TaskBar = GObject.registerClass(
 
                         item.connect('drag-dropped', this.reparentDragItem);
                         item.connect('notify::width', () => {
+                            log('***** taskBar.updateItems notify::width');
                             GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
                                 this._animateActiveIndicator();
                                 return GLib.SOURCE_REMOVE;
@@ -283,6 +290,7 @@ var TaskBar = GObject.registerClass(
         }
 
         _animateActiveIndicator() {
+            log('***** taskBar._animateActiveIndicator');
             let taskBarItem = this.getTaskBarItemOfTileable(
                 this.msWorkspace.tileableFocused
             );
@@ -294,11 +302,15 @@ var TaskBar = GObject.registerClass(
                     this.taskBarItemSignal.id
                 );
             }
+            log('***** taskBar._animateActiveIndicator | item: ' + taskBarItem);
             if (!taskBarItem) {
                 return;
             }
-
+            
+            log('***** taskBar._animateActiveIndicator | mapped: ' + this.mapped);
             if (!this.mapped) return;
+            log('***** taskBar._animateActiveIndicator | width: ' + 
+                    this.taskActiveIndicator.width);
             if (!this.taskActiveIndicator.width) {
                 this.taskActiveIndicator.scale_x = 1;
                 this.taskActiveIndicator.width = taskBarItem.width;
@@ -314,6 +326,15 @@ var TaskBar = GObject.registerClass(
                     },
                 });
             }
+        }
+
+        resetActiveIndicator(tileable) {
+            log('***** taskBar.resetActiveIndicator | tielable: ' + tileable);
+            let taskBarItem = this.getTaskBarItemOfTileable(
+                tileable
+            );
+            this.taskActiveIndicator.x = taskBarItem.x;
+            this.taskActiveIndicator.width = taskBarItem.width;
         }
 
         getTaskBarItemOfTileable(tileable) {
@@ -591,6 +612,7 @@ let TileableItem = GObject.registerClass(
             });
 
             this.closeButton.connect('clicked', () => {
+                log('***** taskBar.TileableItem close-clicked');
                 this.emit('close-clicked');
             });
 
