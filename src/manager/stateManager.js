@@ -72,7 +72,10 @@ var StateManager = class StateManager {
         );
     }
     getState(key) {
-        return this.state[key];
+        if (this.state[key])
+            return this.state[key];
+        else
+            return undefined;
     }
     setState(key, value) {
         if (value == undefined) {

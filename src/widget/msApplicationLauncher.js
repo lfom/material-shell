@@ -8,7 +8,7 @@ const { SetAllocation, Allocate } = Me.imports.src.utils.compatibility;
 const { ShellVersionMatch } = Me.imports.src.utils.compatibility;
 const { AppsManager } = Me.imports.src.manager.appsManager;
 const { MatButton } = Me.imports.src.widget.material.button;
-const { log } = Me.imports.src.utils.debug;
+// const { log } = Me.imports.src.utils.debug;
 
 /* exported MsApplicationLauncher */
 

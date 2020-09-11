@@ -93,9 +93,7 @@ var TaskBar = GObject.registerClass(
                         const item = new TileableItem(tileable);
                         this.menuManager.addMenu(item.menu);
                         item.connect('left-clicked', (_) => {
-                            this.taskActiveIndicator.hide();
                             this.msWorkspace.focusTileable(tileable, true);
-                            this.taskActiveIndicator.show();
                             this.resetActiveIndicator(tileable);
                         });
                         item.connect('middle-clicked', (_) => {
@@ -290,14 +288,14 @@ var TaskBar = GObject.registerClass(
             let taskBarItem = this.getTaskBarItemOfTileable(
                 this.msWorkspace.tileableFocused
             );
-            if (
-                this.taskBarItemSignal &&
-                this.items.includes(this.taskBarItemSignal.from)
-            ) {
-                this.taskBarItemSignal.from.disconnect(
-                    this.taskBarItemSignal.id
-                );
-            }
+            // if (
+            //     this.taskBarItemSignal &&
+            //     this.items.includes(this.taskBarItemSignal.from)
+            // ) {
+            //     this.taskBarItemSignal.from.disconnect(
+            //         this.taskBarItemSignal.id
+            //     );
+            // }
             log('***** taskBar._animateActiveIndicator | item: ' + taskBarItem);
             if (!taskBarItem) {
                 return;
@@ -366,7 +364,7 @@ var TaskBar = GObject.registerClass(
     }
 );
 
-let TaskBarItem = GObject.registerClass(
+var TaskBarItem = GObject.registerClass(
     {
         Signals: {
             'drag-dropped': {},

@@ -115,7 +115,10 @@ var MsWindow = GObject.registerClass(
         }
 
         get dragged() {
-            return Me.msWindowManager.msDndManager.msWindowDragged === this;
+            if (Me.msWindowManager.msDndManager.msWindowDragged)
+                return Me.msWindowManager.msDndManager.msWindowDragged === this;
+            else
+                return false;
         }
 
         get followMetaWindow() {
