@@ -120,6 +120,12 @@ var SplitLayout = GObject.registerClass(
         }
 
         tileTileable(tileable, box, index, siblingLength) {
+
+            if (this.msWorkspace.tileableList.length < 2) {
+                return;
+            }
+
+            let x, y, width, height;
             let verticalPortion = this.vertical
                 ? box.get_height() / this.window_per_screen
                 : box.get_height();
@@ -129,19 +135,31 @@ var SplitLayout = GObject.registerClass(
             if (this.activeTileableList.includes(tileable)) {
                 let activeIndex = this.activeTileableList.indexOf(tileable);
                 if (this.vertical) {
-                    tileable.x = box.x1;
-                    tileable.y = box.y1 + activeIndex * verticalPortion;
+                    x = box.x1;
+                    y = box.y1 + activeIndex * verticalPortion;
                 } else {
-                    tileable.x = box.x1 + activeIndex * horizontalPortion;
-                    tileable.y = box.y1;
+                    x = box.x1 + activeIndex * horizontalPortion;
+                    y = box.y1;
                 }
             } else {
-                tileable.x = box.x1;
-                tileable.y = box.y1;
+                x = box.x1;
+                y = box.y1;
             }
 
-            tileable.width = horizontalPortion;
-            tileable.height = verticalPortion;
+            width = horizontalPortion;
+            height = verticalPortion;
+
+            let {
+                x: gapX,
+                y: gapY,
+                width: gapWidth,
+                height: gapHeight,
+            } = this.applyGaps(x, y, width, height);
+
+            tileable.x = gapX;
+            tileable.y = gapY;
+            tileable.width = gapWidth;
+            tileable.height = gapHeight;
         }
 
         /*
