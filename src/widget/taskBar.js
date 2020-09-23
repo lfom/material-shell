@@ -91,6 +91,13 @@ var TaskBar = GObject.registerClass(
                         this.menuManager.addMenu(item.menu);
                         item.connect('left-clicked', (_) => {
                             this.msWorkspace.focusTileable(tileable);
+                            if (!item.tileable.metaWindow)
+                                return;
+                            log('*** taskBar.updateItems | window: ' + item.tileable.metaWindow.title);
+                            if (item.tileable.metaWindow.demands_attention)
+                                item.tileable.metaWindow.unset_demands_attention();
+                            else
+                                item.tileable.metaWindow.set_demands_attention();
                         });
                         item.connect('middle-clicked', (_) => {
                             tileable.kill();

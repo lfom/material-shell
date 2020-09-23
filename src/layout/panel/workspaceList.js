@@ -89,6 +89,24 @@ var WorkspaceList = GObject.registerClass(
                     );
                 }
             );
+
+            global.display.disconnect(
+                Main.windowAttentionHandler._windowDemandsAttentionId);
+	        global.display.disconnect(
+                Main.windowAttentionHandler._windowMarkedUrgentId);
+            this.windowAttention = global.display.connect(
+                'window-demands-attention',
+                (display, window) => {
+                    log('***** workspaceList.attention | window: ' + window.title);
+                }
+            );
+
+            this.windowUrgent = global.display.connect(
+                'window-marked-urgent',
+                (display, window) => {
+                    log('***** workspaceList.urgent | window: ' + window.title);
+                }
+            );
         }
 
         buildButtons() {
@@ -304,6 +322,12 @@ var WorkspaceList = GObject.registerClass(
 
         _onDestroy() {
             global.workspace_manager.disconnect(this.workspaceSignal);
+            global.display.disconnect(this.windowAttention);
+            global.display.disconnect(this.windowUrgent);
+            Main.windowAttentionHandler._windowDemandsAttentionId = global.display.connect('window-demands-attention',
+	                         Main.windowAttentionHandler._onWindowDemandsAttention.bind(Main.windowAttentionHandler));
+	        Main.windowAttentionHandler._windowMarkedUrgentId = global.display.connect('window-marked-urgent',
+	                         Main.windowAttentionHandler._onWindowDemandsAttention.bind(Main.windowAttentionHandler));
         }
     }
 );
@@ -326,6 +350,15 @@ var WorkspaceButton = GObject.registerClass(
             super._init({
                 child: this.workspaceButtonIcon,
             });
+
+            this._badge = new St.Label({
+                text:' ',
+                style_class: 'workspace-badge'
+            });
+            if (this.workspaceButtonIcon.appIconList.length !== 1)
+                this._badge.add_style_class_name('workspace-badge-visible');
+            this.add_child(this._badge);
+
             this._delegate = this;
 
             this.buildMenu();
@@ -612,6 +645,21 @@ var WorkspaceButton = GObject.registerClass(
                 Me.msThemeManager.getPanelSize(Main.layoutManager.primaryIndex),
             ];
         }
+
+        vfunc_allocate(allocationBox, flags) {
+            super.vfunc_allocate(allocationBox, flags);
+            SetAllocation(this, allocationBox, flags);
+
+            const themeNode = this.get_theme_node();
+            allocationBox = themeNode.get_content_box(allocationBox);
+            const portion = Math.ceil((allocationBox.x2 - allocationBox.x1) / 4);
+            let centerBox = new Clutter.ActorBox();
+            centerBox.x1 = allocationBox.x1 + portion;
+            centerBox.x2 = allocationBox.x2 - portion;
+            centerBox.y1 = allocationBox.y1 + portion;
+            centerBox.y2 = allocationBox.y2 - portion;
+            Allocate(this._badge, centerBox, flags);
+        }
     }
 );
 
@@ -635,6 +683,9 @@ var WorkspaceButtonIcon = GObject.registerClass(
             });
             Me.msThemeManager.connect('panel-icon-style-changed', () => {
                 this.buildIcons();
+            });
+            Me.msThemeManager.connect('panel-size-changed', () => {
+                this.queue_relayout();
             });
         }
 

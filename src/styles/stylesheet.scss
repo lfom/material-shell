@@ -5,6 +5,8 @@ $ripple: rgba(255, 255, 255, 0.12);
 $shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
 $surface-opacity: 0.987; // Don't change this value since it's dynamically changed by the theme Manager
 $panel-opacity: 0.876; // Don't change this value since it's dynamically changed by the theme Manager
+$badge-color-bg: #fad000; // badge background color
+$badge-color-fg: black; // badge foreground color
 
 @function getForegroundColor($bgColor, $opacity) {
     @if ($bgColor== 'light') {
@@ -158,6 +160,21 @@ $panel-opacity: 0.876; // Don't change this value since it's dynamically changed
     }
 
     width: 3px;
+}
+
+.workspace-badge {
+    width: 16px;
+    height: 16px;
+    color: $badge-color-fg;
+    border-radius: 8px;
+    font-size: 10px;
+    text-align: center;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.workspace-badge-visible {
+    background: $badge-color-bg;
 }
 
 .ripple-wave {
