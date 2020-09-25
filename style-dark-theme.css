@@ -117,8 +117,6 @@ subtitle-1 {
       background: rgba(255, 255, 255, 0.04);
       box-shadow: inset 3px 0 0px #3f51b5;
       color: rgba(255, 255, 255, 0.87); }
-    #msPanel .panel-button .system-status-icon {
-      icon-size: 1.09em; }
     .unlock-screen #msPanel .panel-button,
     .login-screen #msPanel .panel-button,
     .lock-screen #msPanel .panel-button {
@@ -131,17 +129,19 @@ subtitle-1 {
       .lock-screen #msPanel .panel-button:hover,
       .lock-screen #msPanel .panel-button:active {
         color: rgba(255, 255, 255, 0.87); }
-  #msPanel .panel-status-indicators-box {
-    vertical-align: middle;
-    text-align: center;
-    padding: 4px 0px; }
   #msPanel .panel-status-indicators-box,
   #msPanel .panel-status-menu-box {
-    spacing: 2px; }
-  #msPanel .panel-status-menu-box {
-    padding: 8px 0px; }
+    spacing: 2px;
+    vertical-align: middle;
+    text-align: center;
+    min-height: 20px; }
   #msPanel .clock-display * {
     padding: 4px 0px !important; }
+  #msPanel .system-status-icon {
+    height: 20px;
+    icon-size: 1.09em;
+    margin-top: 4px;
+    margin-bottom: 4px; }
 
 #topPanel {
   background: rgba(25, 25, 25, 0.876);

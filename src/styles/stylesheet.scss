@@ -236,9 +236,6 @@ $panel-opacity: 0.876; // Don't change this value since it's dynamically changed
             @include foreground-high-emphasis($theme);
         }
 
-        .system-status-icon {
-            icon-size: 1.09em;
-        }
         .unlock-screen &,
         .login-screen &,
         .lock-screen & {
@@ -251,25 +248,24 @@ $panel-opacity: 0.876; // Don't change this value since it's dynamically changed
         }
     }
 
-    .panel-status-indicators-box {
-        vertical-align: middle;
-        text-align: center;
-        padding: 4px 0px;
-    }
-
     .panel-status-indicators-box,
     .panel-status-menu-box {
         spacing: 2px;
-    }
-
-    .panel-status-menu-box {
-        padding: 8px 0px;
+        vertical-align: middle;
+        text-align: center;
+        min-height: 20px;
     }
 
     .clock-display {
         * {
             padding: 4px 0px !important;
         }
+    }
+    .system-status-icon {
+        height: 20px;
+        icon-size: 1.09em;
+        margin-top: 4px;
+        margin-bottom: 4px;
     }
 }
 
