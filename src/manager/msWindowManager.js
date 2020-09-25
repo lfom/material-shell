@@ -277,7 +277,7 @@ var MsWindowManager = class MsWindowManager extends MsManager {
                     if (
                         (waitingMetaWindow.metaWindow.firstFrameDrawn &&
                             !app.is_window_backed()) ||
-                        timestamp - waitingMetaWindow.timestamp > 2000
+                        timestamp - waitingMetaWindow.timestamp > 3000
                     ) {
                         const msWindow = this.createNewMsWindow(
                             app.get_id(),
