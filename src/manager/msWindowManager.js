@@ -29,6 +29,10 @@ var MsWindowManager = class MsWindowManager extends MsManager {
             this.onFocusMetaWindow(global.display.focus_window);
         });
 
+        this.observe(global.window_manager, 'size-changed', (wm, actor) => {
+            actor.lastResize = Date.now();
+        });
+
         this.observe(
             global.display,
             'window-demands-attention',
@@ -391,6 +395,7 @@ var MsWindowManager = class MsWindowManager extends MsManager {
             dialogTypes.includes(metaWindow.window_type) ||
             (metaWindow.get_transient_for() != null &&
                 metaWindow.skip_taskbar) ||
+            !metaWindow.resizeable ||
             (isFrozen && !isMaximizedAny)
         );
     }
