@@ -78,31 +78,42 @@ var TranslationAnimator = GObject.registerClass(
                 });
             }
 
+            let crashed = false;
             enteringActors.forEach((actor, index) => {
                 // check if the next actor are already in transition
-                let nextActorFound = this.transitionContainer
-                    .get_children()
-                    .find((existingActor) => {
-                        return existingActor === actor;
-                    });
-                //insert nextActor Clone at the top pile if direction is positive or at the end if negative
-                if (!nextActorFound) {
-                    reparentActor(actor, this.transitionContainer);
-                    if (direction < 0) {
-                        this.transitionContainer.set_child_at_index(
-                            actor,
-                            index
-                        );
-                        if (this.vertical) {
-                            this.transitionContainer.translation_y -=
-                                actor.height;
-                        } else {
-                            this.transitionContainer.translation_x -=
-                                actor.width;
+                if (!actor) return;
+                try {
+                    let nextActorFound = this.transitionContainer
+                        .get_children()
+                        .find((existingActor) => {
+                            return existingActor === actor;
+                        });
+                    //insert nextActor Clone at the top pile if direction is positive or at the end if negative
+                    if (!nextActorFound) {
+                        reparentActor(actor, this.transitionContainer);
+                        if (direction < 0) {
+                            this.transitionContainer.set_child_at_index(
+                                actor,
+                                index
+                            );
+                            if (this.vertical) {
+                                this.transitionContainer.translation_y -=
+                                    actor.height;
+                            } else {
+                                this.transitionContainer.translation_x -=
+                                    actor.width;
+                            }
                         }
                     }
+                } catch (error) {
+                    logError(error, '[material-shell.translationAnimation]');
+                    crashed = true;
+                    return;
                 }
             });
+
+            // if (crashed) return;
+
             //This seem uncessary but it's help to the this.width calculation when the next actor is a placeholder
             this.transitionContainer.set_child_at_index(
                 this.transitionContainer.get_child_at_index(0),
