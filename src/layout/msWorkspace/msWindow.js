@@ -730,11 +730,16 @@ var MsWindow = GObject.registerClass(
         }
 
         toString() {
-            let string = super.toString();
-            return `${string.slice(
-                0,
-                string.length - 1
-            )} ${this.app.get_name()}]`;
+            try { //FIXME temporary workaround
+                let string = super.toString();
+                return `${string.slice(
+                    0,
+                    string.length - 1
+                )} ${this.app.get_name()}]`;
+            } catch (error) {
+                log('[material-shell|msWindow.toString]');
+                return 'toString-error';
+            }
         }
 
         _onDestroy() {

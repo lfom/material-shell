@@ -78,11 +78,10 @@ var TranslationAnimator = GObject.registerClass(
                 });
             }
 
-            let crashed = false;
             enteringActors.forEach((actor, index) => {
                 // check if the next actor are already in transition
                 if (!actor) return;
-                try {
+                try { //FIXME temporary workaround
                     let nextActorFound = this.transitionContainer
                         .get_children()
                         .find((existingActor) => {
@@ -106,13 +105,10 @@ var TranslationAnimator = GObject.registerClass(
                         }
                     }
                 } catch (error) {
-                    logError(error, '[material-shell.translationAnimation]');
-                    crashed = true;
+                    log('[material-shell|translationAnimator.setTranslation]');
                     return;
                 }
             });
-
-            // if (crashed) return;
 
             //This seem uncessary but it's help to the this.width calculation when the next actor is a placeholder
             this.transitionContainer.set_child_at_index(

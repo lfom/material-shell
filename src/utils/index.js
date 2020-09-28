@@ -85,7 +85,7 @@ var reparentActor = (actor, parent) => {
             actor.grab_key_focus();
         }
     } catch (error) {
-        logError(error, '[material-shell.index]');
+        log('[material-shell|index.reparentActor]');
     }
     Me.reparentInProgress = false;
 };
