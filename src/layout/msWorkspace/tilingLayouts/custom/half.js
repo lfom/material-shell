@@ -11,7 +11,6 @@ const {
 var HalfLayout = GObject.registerClass(
     class HalfLayout extends BaseTilingLayout {
         tileTileable(tileable, box, index, siblingLength) {
-
             if (box.get_width() > box.get_height()) {
                 this.tileTileableHorizontal(
                     tileable,

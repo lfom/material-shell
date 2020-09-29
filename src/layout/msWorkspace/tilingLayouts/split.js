@@ -120,8 +120,6 @@ var SplitLayout = GObject.registerClass(
         }
 
         tileTileable(tileable, box, index, siblingLength) {
-
-            log('*** split.tileTileable | index: ' + index + ' siblingLength: ' + siblingLength);
             // Do nothing if App Launcher is the only tileable
             if (index === 0 && siblingLength === 1) {
                 tileable.x = box.x1;
