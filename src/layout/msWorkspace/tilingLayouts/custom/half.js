@@ -12,10 +12,6 @@ var HalfLayout = GObject.registerClass(
     class HalfLayout extends BaseTilingLayout {
         tileTileable(tileable, box, index, siblingLength) {
 
-            if (this.msWorkspace.tileableList.length < 2) {
-                return;
-            }
-
             if (box.get_width() > box.get_height()) {
                 this.tileTileableHorizontal(
                     tileable,

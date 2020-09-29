@@ -121,45 +121,50 @@ var SplitLayout = GObject.registerClass(
 
         tileTileable(tileable, box, index, siblingLength) {
 
-            if (this.msWorkspace.tileableList.length < 2) {
-                return;
-            }
-
-            let x, y, width, height;
-            let verticalPortion = this.vertical
-                ? box.get_height() / this.window_per_screen
-                : box.get_height();
-            let horizontalPortion = this.vertical
-                ? box.get_width()
-                : box.get_width() / this.window_per_screen;
-            if (this.activeTileableList.includes(tileable)) {
-                let activeIndex = this.activeTileableList.indexOf(tileable);
-                if (this.vertical) {
-                    x = box.x1;
-                    y = box.y1 + activeIndex * verticalPortion;
+            log('*** split.tileTileable | index: ' + index + ' siblingLength: ' + siblingLength);
+            // Do nothing if App Launcher is the only tileable
+            if (index === 0 && siblingLength === 1) {
+                tileable.x = box.x1;
+                tileable.y = box.y1;
+                tileable.width = box.get_width();
+                tileable.height = box.get_height();
+            } else {
+                let x, y, width, height;
+                let verticalPortion = this.vertical
+                    ? box.get_height() / this.window_per_screen
+                    : box.get_height();
+                let horizontalPortion = this.vertical
+                    ? box.get_width()
+                    : box.get_width() / this.window_per_screen;
+                if (this.activeTileableList.includes(tileable)) {
+                    let activeIndex = this.activeTileableList.indexOf(tileable);
+                    if (this.vertical) {
+                        x = box.x1;
+                        y = box.y1 + activeIndex * verticalPortion;
+                    } else {
+                        x = box.x1 + activeIndex * horizontalPortion;
+                        y = box.y1;
+                    }
                 } else {
-                    x = box.x1 + activeIndex * horizontalPortion;
+                    x = box.x1;
                     y = box.y1;
                 }
-            } else {
-                x = box.x1;
-                y = box.y1;
+
+                width = horizontalPortion;
+                height = verticalPortion;
+
+                let {
+                    x: gapX,
+                    y: gapY,
+                    width: gapWidth,
+                    height: gapHeight,
+                } = this.applyGaps(x, y, width, height);
+
+                tileable.x = gapX;
+                tileable.y = gapY;
+                tileable.width = gapWidth;
+                tileable.height = gapHeight;
             }
-
-            width = horizontalPortion;
-            height = verticalPortion;
-
-            let {
-                x: gapX,
-                y: gapY,
-                width: gapWidth,
-                height: gapHeight,
-            } = this.applyGaps(x, y, width, height);
-
-            tileable.x = gapX;
-            tileable.y = gapY;
-            tileable.width = gapWidth;
-            tileable.height = gapHeight;
         }
 
         /*
