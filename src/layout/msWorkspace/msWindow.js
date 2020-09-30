@@ -736,7 +736,7 @@ var MsWindow = GObject.registerClass(
                     0,
                     string.length - 1
                 )} ${this.app.get_name()}]`;
-            } catch (error) {
+            } catch {
                 log('[material-shell|msWindow.toString]');
                 return 'toString-error';
             }

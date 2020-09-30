@@ -23,13 +23,13 @@ var MsManager = class MsManager {
             if (signal.from) {
                 try {
                     signal.from.disconnect(signal.id);
-                } catch (error) {
-                    Me.log(
+                } catch {
+                    log(
                         `Failed to disconnect signal ${signal.id} from ${
                             signal.from
                         } ${
                             signal.from.constructor.name
-                        } ${signal.from.toString()}  `
+                        }`
                     );
                 }
             }
