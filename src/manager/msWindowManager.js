@@ -9,6 +9,8 @@ const { MsWindow } = Me.imports.src.layout.msWorkspace.msWindow;
 const { MsDndManager } = Me.imports.src.manager.msDndManager;
 const { getSettings } = Me.imports.src.utils.settings;
 
+const isWayland = GLib.getenv('XDG_SESSION_TYPE').toLowerCase() === 'wayland';
+
 /* exported MsWindowManager */
 var MsWindowManager = class MsWindowManager extends MsManager {
     constructor() {
@@ -281,7 +283,7 @@ var MsWindowManager = class MsWindowManager extends MsManager {
                     if (
                         (waitingMetaWindow.metaWindow.firstFrameDrawn &&
                             !app.is_window_backed()) ||
-                        timestamp - waitingMetaWindow.timestamp > 2000
+                        timestamp - waitingMetaWindow.timestamp > 3000
                     ) {
                         const msWindow = this.createNewMsWindow(
                             app.get_id(),
@@ -309,7 +311,7 @@ var MsWindowManager = class MsWindowManager extends MsManager {
         this.msWindowWaitingForMetaWindowList.forEach((waitingMsWindow) => {
             if (
                 (waitingMsWindow.checked &&
-                    timestamp - waitingMsWindow.timestamp > 2000) ||
+                    timestamp - waitingMsWindow.timestamp > 3000) ||
                 timestamp - waitingMsWindow.timestamp > 5000
             ) {
                 waitingMsWindow.msWindow.kill();
@@ -359,10 +361,20 @@ var MsWindowManager = class MsWindowManager extends MsManager {
 
     openAppForMsWindow(msWindow) {
         this.setMsWindowAsWaitingForMetaWindow(msWindow);
-        let workspaceIndex = Me.msWorkspaceManager.primaryMsWorkspaces.indexOf(
+        const workspaceIndex = Me.msWorkspaceManager.primaryMsWorkspaces.indexOf(
             msWindow.msWorkspace
         );
-        msWindow.app.open_new_window(workspaceIndex);
+        const app = msWindow.app;
+        if (isWayland && app.get_state() === Shell.AppState.STOPPED) {
+            const useGPU =
+                app.get_app_info().get_boolean('PrefersNonDefaultGPU') ||
+                app.get_app_info().get_boolean('X-KDE-RunOnDiscreteGpu');
+            log('*** material-shell.msWindowManager | launch: ' +
+                app.get_name() + ' useGPU: ' + useGPU);
+            app.launch(0, workspaceIndex, useGPU);
+        } else {
+            app.open_new_window(workspaceIndex);
+        }
     }
 
     _handleWindow(metaWindow) {
