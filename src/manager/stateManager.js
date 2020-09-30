@@ -42,15 +42,6 @@ var StateManager = class StateManager {
                         this.state = {};
                     }
                 }
-
-                if (!this.isEnabled) {
-                    Object.keys(this.state).forEach(
-                        (key) =>
-                            key === 'notification-check' ||
-                            delete this.state[key]
-                    );
-                }
-
                 callback(this.state);
             });
         } else {
@@ -95,7 +86,6 @@ var StateManager = class StateManager {
         }
     }
     setState(key, value) {
-        if (!this.isEnabled && key !== 'notification-check') return;
         if (value === undefined) {
             delete this.state[key];
         } else {
@@ -104,9 +94,5 @@ var StateManager = class StateManager {
         this.saveRegistry();
     }
 
-    destroy() {
-        if (this.observer) {
-            this.settings.disconnect(this.observer);
-        }
-    }
+    destroy() {}
 };
