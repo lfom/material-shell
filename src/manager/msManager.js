@@ -1,5 +1,6 @@
 /** Gnome libs imports */
 const Signals = imports.signals;
+const { Clutter } = imports.gi;
 
 /** Extension imports */
 const Me = imports.misc.extensionUtils.getCurrentExtension();
@@ -15,6 +16,11 @@ var MsManager = class MsManager {
             id: subject.connect(property, callback),
         };
         this.signals.push(signal);
+        if (subject instanceof Clutter.Actor) {
+            subject.connect('destroy', () => {
+                this.signals.splice(this.signals.indexOf(signal), 1);
+            });
+        }
         return () => {
             subject.disconnect(signal.id);
         };
