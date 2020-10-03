@@ -502,7 +502,9 @@ var MsWorkspaceManager = class MsWorkspaceManager extends MsManager {
 
     saveCurrentState() {
         // Avoid unnecessary work
-        if (!this.isPersistenceEnabled) return;
+        if (!this.isPersistenceEnabled || !Me.loaded || Me.disableInProgress)
+            return;
+
         const workspacesState = {
             msWorkspaceList: [],
             primaryWorkspaceActiveIndex: this.workspaceManager.get_active_workspace_index(),
