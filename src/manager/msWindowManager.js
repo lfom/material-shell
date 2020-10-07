@@ -379,20 +379,7 @@ var MsWindowManager = class MsWindowManager extends MsManager {
         const workspaceIndex = Me.msWorkspaceManager.primaryMsWorkspaces.indexOf(
             msWindow.msWorkspace
         );
-        // const app = msWindow.app;
-        // if (isWayland && app.get_state() === Shell.AppState.STOPPED) {
-        //     const useGPU =
-        //         app.get_app_info().get_boolean('PrefersNonDefaultGPU') ||
-        //         app.get_app_info().get_boolean('X-KDE-RunOnDiscreteGpu');
-        //     log('*** material-shell.msWindowManager | launch: ' +
-        //         app.get_name() + ' useGPU: ' + useGPU);
-        //     app.launch(0, workspaceIndex, useGPU);
-        // } else {
-        //     log('*** material-shell.msWindowManager | open: ' + msWindow.title);
-        //     app.open_new_window(workspaceIndex);
-        // }
-        log('*** material-shell.msWindowManager | open: ' + msWindow.title + ' ***');
-        msWindow.app.open_new_window(workspaceIndex);
+        msWindow.app.launch(0, workspaceIndex, false);
     }
 
     _handleWindow(metaWindow) {

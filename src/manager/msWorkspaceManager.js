@@ -246,10 +246,6 @@ var MsWorkspaceManager = class MsWorkspaceManager extends MsManager {
 
         for (let i = 0; i < this.workspaceManager.n_workspaces; i++) {
             if (!this.primaryMsWorkspaces[i]) {
-                /* const workspace = this.workspaceManager.append_new_workspace(
-                    false,
-                    global.get_current_time()
-                ); */
                 this.setupNewWorkspace(
                     this.workspaceManager.get_workspace_by_index(i)
                 );
@@ -297,19 +293,20 @@ var MsWorkspaceManager = class MsWorkspaceManager extends MsManager {
             emptyWorkspaces[workspaceIndex] = false;
         }
 
-        emptyWorkspaces
+        emptyWorkspaces = emptyWorkspaces
             .map((empty, index) => {
                 return empty
                     ? this.workspaceManager.get_workspace_by_index(index)
                     : null;
             })
-            .filter((workspace) => workspace != null)
-            .forEach((workspace) => {
-                this.workspaceManager.remove_workspace(
-                    workspace,
-                    global.get_current_time()
-                );
-            });
+            .filter((workspace) => workspace != null);
+
+        emptyWorkspaces.forEach((workspace) => {
+            this.workspaceManager.remove_workspace(
+                workspace,
+                global.get_current_time()
+            );
+        });
     }
 
     onMonitorsChanged() {
@@ -401,7 +398,6 @@ var MsWorkspaceManager = class MsWorkspaceManager extends MsManager {
                 }
             });
         this._updatingMonitors = false;
-
         this.stateChanged();
         this.emit('dynamic-super-workspaces-changed');
     }
@@ -475,6 +471,7 @@ var MsWorkspaceManager = class MsWorkspaceManager extends MsManager {
             Me.disableInProgress
         )
             return;
+
         this.stateChangedTriggered = true;
         GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
             this.workspaceTracker._checkWorkspaces();
@@ -585,6 +582,7 @@ var MsWorkspaceManager = class MsWorkspaceManager extends MsManager {
             ];
         }
         this.setWindowToMsWorkspace(msWindow, msWorkspace);
+
         this.stateChanged();
     }
 
