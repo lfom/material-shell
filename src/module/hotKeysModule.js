@@ -13,6 +13,7 @@ var KeyBindingAction = {
     // window actions
     PREVIOUS_WINDOW: 'previous-window',
     NEXT_WINDOW: 'next-window',
+    LAST_WINDOW: 'last-window',
     APP_LAUNCHER: 'app-launcher',
     KILL_FOCUSED_WINDOW: 'kill-focused-window',
     MOVE_WINDOW_LEFT: 'move-window-left',
@@ -58,10 +59,23 @@ var HotKeysModule = class HotKeysModule {
             msWorkspace.focusNextTileable();
         });
 
+        this.actionNameToActionMap.set(KeyBindingAction.LAST_WINDOW, () => {
+            const msWorkspace = Me.msWorkspaceManager.getActiveMsWorkspace();
+            msWorkspace.focusPrevious();
+        });
+
         this.actionNameToActionMap.set(KeyBindingAction.APP_LAUNCHER, () => {
             const msWorkspace = Me.msWorkspaceManager.getActiveMsWorkspace();
-
-            msWorkspace.focusAppLauncher();
+            if (
+                msWorkspace.tileableFocused ===
+                msWorkspace.appLauncher
+            ) {
+                if (msWorkspace.lastFocusUsedHotkey) {
+                    msWorkspace.focusPrevious();
+                }
+                return;
+            }
+            msWorkspace.focusAppLauncher(true);
         });
 
         this.actionNameToActionMap.set(
@@ -102,6 +116,11 @@ var HotKeysModule = class HotKeysModule {
             let lastIndex = this.workspaceManager.n_workspaces - 1;
             if (currentIndex < lastIndex) {
                 Me.msWorkspaceManager.primaryMsWorkspaces[lastIndex].activate();
+                this.lastStash = currentIndex;
+            } else if (this.lastStash !== null) {
+                Me.msWorkspaceManager.primaryMsWorkspaces[
+                    this.lastStash
+                ].activate();
             }
         });
 
