@@ -9,9 +9,11 @@ const { MsWindow } = Me.imports.src.layout.msWorkspace.msWindow;
 const { MsDndManager } = Me.imports.src.manager.msDndManager;
 const { getSettings } = Me.imports.src.utils.settings;
 
+// Wayland takes much longer to display new windows, so the way is increased
 const isWayland = GLib.getenv('XDG_SESSION_TYPE').toLowerCase() === 'wayland';
 const MAX_TIME_FIND = 2000 + ((isWayland ? 2 : 0) * 1000);
 const MAX_TIME_WAIT = 5000 + ((isWayland ? 2 : 0) * 1000);
+const TIME_CHECK = 100 + ((isWayland ? 1 : 0) * 100);
 
 /* exported MsWindowManager */
 var MsWindowManager = class MsWindowManager extends MsManager {
@@ -287,10 +289,10 @@ var MsWindowManager = class MsWindowManager extends MsManager {
                         msWindowFound.setWindow(waitingMetaWindow.metaWindow);
                     }
                 } else {
+                    // This is not needed
                     // let app = this.windowTracker.get_window_app(
                     //     waitingMetaWindow.metaWindow
                     // );
-                    log(`*** material-shell.msWindowManager | t1: ${timestamp - waitingMetaWindow.timestamp}`);
                     if (
                         (waitingMetaWindow.metaWindow.firstFrameDrawn &&
                             !app.is_window_backed()) ||
@@ -345,8 +347,7 @@ var MsWindowManager = class MsWindowManager extends MsManager {
             log('*** material-shell.msWindowManager | checkInProgress: ' + this.checkInProgress);
             if (this.checkInProgress) return;
             this.checkInProgress = true;
-            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
-                log('*** material-shell.msWindowManager | timeout');
+            GLib.timeout_add(GLib.PRIORITY_DEFAULT, TIME_CHECK, () => {
                 this.checkInProgress = false;
                 this.checkWindowsForAssignations();
             });
@@ -379,7 +380,7 @@ var MsWindowManager = class MsWindowManager extends MsManager {
         const workspaceIndex = Me.msWorkspaceManager.primaryMsWorkspaces.indexOf(
             msWindow.msWorkspace
         );
-        msWindow.app.launch(0, workspaceIndex, false);
+        msWindow.app.open_new_window(workspaceIndex);
     }
 
     _handleWindow(metaWindow) {

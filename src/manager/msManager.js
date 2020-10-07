@@ -26,23 +26,6 @@ var MsManager = class MsManager {
         };
     }
 
-    disconnectItem(subject) {
-        this.signals
-            .filter((signal) => signal.from === subject)
-            .forEach((signal) => {
-                if (signal.from && signal.id) {
-                    log('*** material-shell.msManager | i.prop: ' + signal.prop);
-                    try {
-                        signal.from.disconnect(signal.id);
-                        this.signals.splice(this.signals.indexOf(signal), 1);
-                    } catch {
-                        log(`Failed to disconnect i.signal ${signal.id}`);
-                    }
-                }
-            });
-            log('*** material-shell.msManager | i.length: ' + this.signals.length);
-    }
-
     destroy() {
         this.signals.forEach((signal) => {
             if (signal.from && signal.id) {
@@ -59,6 +42,26 @@ var MsManager = class MsManager {
             }
         });
         log('*** material-shell.msManager | d.length: ' + this.signals.length);
+    }
+
+    removeAll(subject) {
+        for (let i = this.signals.length ; i--;) {
+            if (this.signals[i].from == subject) {
+                let id = this.signals[i].id;
+                this.signals.splice(i, 1);
+                if (id) {
+                    try {
+                        subject.disconnect(id);
+                    } catch (e) {
+                        Me.log(
+                            `Failed to disconnect signal ${id} (${
+                                subject.constructor.name
+                            })`
+                        );
+                    }
+                }
+            }
+        }
     }
 };
 Signals.addSignalMethods(MsManager.prototype);

@@ -350,7 +350,7 @@ var TaskBar = GObject.registerClass(
     }
 );
 
-let TaskBarItem = GObject.registerClass(
+var TaskBarItem = GObject.registerClass(
     {
         Signals: {
             'drag-dropped': {},
@@ -633,7 +633,7 @@ let TileableItem = GObject.registerClass(
         }
 
         disconnectTileable() {
-            this.signalManager.disconnectItem(this.tileable);
+            this.signalManager.removeAll(this.tileable);
         }
 
         setStyle() {
