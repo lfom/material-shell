@@ -44,6 +44,7 @@ var MsApplicationLauncher = GObject.registerClass(
                 });
                 this.appListContainer.addAppButton(button);
             });
+            this.appListContainer.initFilteredAppButtonList();
             this.connect('key-focus-in', () => {
                 this.appListContainer.inputContainer.grab_key_focus();
             });
@@ -242,6 +243,10 @@ var MsApplicationButtonContainer = GObject.registerClass(
             this.inputContainer.set_text('');
         }
 
+        initFilteredAppButtonList() {
+            this.filteredAppButtonList = this.appButtonList;
+        }
+
         updateFilteredAppButtonList() {
             this.filteredAppButtonList = this.appButtonList.filter((button) => {
                 let stringToSearch = `${button.app.get_name()}${button.app.get_id()}${button.app.get_description()}`;
@@ -351,7 +356,6 @@ var MsApplicationButtonContainer = GObject.registerClass(
         addAppButton(button) {
             this.appButtonList.push(button);
             this.add_child(button);
-            this.updateFilteredAppButtonList();
         }
 
         vfunc_allocate(box, flags) {
