@@ -50,6 +50,14 @@ var BlinkingIndicator = GObject.registerClass(
                 }
             }
         }
+
+        destroy() {
+            this.remove_all_transitions();
+            if (this.transition) {
+                this.transition = null;
+            }
+            super.destroy();
+        }
     }
 );
 
@@ -263,6 +271,7 @@ var MsStatusArea = GObject.registerClass(
             Me.disconnect(this.disableConnect);
             this.dateMenu.box.remove_child(this.dateMenu._indicator);
             this.dateMenu._indicator.destroy();
+            this.dateMenu._indicator = null;
             this.dateMenu.box.add_child(this.oldIndicator);
             this.dateMenu._indicator = this.oldIndicator;
             this.dateMenu.box.insert_child_at_index(this.dateMenu.indicatorPad, 0);
