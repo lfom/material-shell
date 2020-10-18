@@ -30,7 +30,9 @@ var BlinkingIndicator = GObject.registerClass(
         }
 
         _sync() {
-            let doNotDisturb = !this._settings.get_boolean('show-banners');
+            let doNotDisturb = this._settings
+                ? !this._settings.get_boolean('show-banners')
+                : null;
             this.icon_name = doNotDisturb
                 ? 'notifications-disabled-symbolic'
                 : 'message-indicator-symbolic';
