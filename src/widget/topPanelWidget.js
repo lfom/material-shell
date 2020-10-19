@@ -38,15 +38,6 @@ var TopPanel = GObject.registerClass(
 
             this.add_child(this.taskBar);
             this.add_child(this.tilingButton);
-
-        }
-
-        buildIcon(height) {
-            this.iconSize = height;
-            this.tilingIcon.set_icon_size(
-                Me.msThemeManager.getPanelSizeNotScaled() / 2
-            );
-            this.queue_relayout();
         }
 
         handleDragOver(source) {
@@ -72,8 +63,11 @@ var TopPanel = GObject.registerClass(
         }
 
         vfunc_allocate(box, flags) {
-            if (!this.tilingIcon || this.iconSize != box.get_height()) {
-                this.buildIcon(box.get_height());
+            if (
+                !this.tilingIcon ||
+                this.tilingIcon.get_icon_size() != box.get_height() / 2
+            ) {
+                this.tilingIcon.set_icon_size(box.get_height() / 2);
             }
             SetAllocation(this, box, flags);
             let themeNode = this.get_theme_node();
