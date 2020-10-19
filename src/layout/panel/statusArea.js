@@ -27,10 +27,17 @@ var BlinkingIndicator = GObject.registerClass(
 
             super._init();
             this.visible = true;
+            log('*** ms.statusArea | init.s: ' + !!this._settings);
         }
 
         _sync() {
-            let doNotDisturb = this._settings
+            log('*** ms.statusArea | sync.s: ' + !!this._settings);
+            log('*** ms.statusArea | sync.c: ' + this._count);
+            if (Main.sessionMode.currentMode === 'unlock-dialog') {
+                log('*** ms.statusArea | locked');
+                return;
+            }
+            let doNotDisturb = !!this._settings
                 ? !this._settings.get_boolean('show-banners')
                 : null;
             this.icon_name = doNotDisturb
@@ -51,12 +58,21 @@ var BlinkingIndicator = GObject.registerClass(
             }
         }
 
-        destroy() {
+        _onDestroy() {
             this.remove_all_transitions();
             if (this.transition) {
                 this.transition = null;
             }
-            super.destroy();
+            if (this.has_style_class_name('indicator-active')) {
+                this.remove_style_class_name('indicator-active');
+            }
+            this._sync = () => {};
+            this._onSourceAdded = this._sync;
+            this._onSourceRemoved = this._sync;
+            this._updateCount = this._sync;
+            this.emit('destroy');
+
+            log('*** ms.statusArea | onDestroy');
         }
     }
 );
@@ -100,8 +116,9 @@ var MsStatusArea = GObject.registerClass(
             this.dateMenu.box.remove_child(this.dateMenu.indicatorPad);
             this.oldIndicator = this.dateMenu._indicator;
             this.dateMenu.box.remove_child(this.oldIndicator);
-            this.dateMenu._indicator = new BlinkingIndicator();
-            this.dateMenu.box.add_child(this.dateMenu._indicator);
+            this.newIndicator = new BlinkingIndicator();
+            this.dateMenu._indicator = this.newIndicator;
+            this.dateMenu.box.add_child(this.newIndicator);
             this.dateMenu.box.set_x_align(Clutter.ActorAlign.CENTER);
             let update = () => {
                 /**
@@ -268,13 +285,13 @@ var MsStatusArea = GObject.registerClass(
             });
         }
         onDisable() {
+            log('*** ms.statusArea | onDisable');
             Me.disconnect(this.disableConnect);
-            this.dateMenu.box.remove_child(this.dateMenu._indicator);
-            this.dateMenu._indicator.destroy();
-            this.dateMenu._indicator = null;
-            this.dateMenu.box.add_child(this.oldIndicator);
+            this.dateMenu.box.remove_child(this.newIndicator);
+            this.newIndicator._onDestroy();
+            this.newIndicator = null;
             this.dateMenu._indicator = this.oldIndicator;
-            this.dateMenu.box.insert_child_at_index(this.dateMenu.indicatorPad, 0);
+            this.dateMenu.box.add_child(this.oldIndicator);
             this.unVerticaliseDateMenuButton();
             this.restorePanelMenuSide();
             this.restorePanelActors();
